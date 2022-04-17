@@ -43,6 +43,20 @@ const PatientCards = () => {
         }
     ]);
 
+    const stompClient;
+
+    const connect = () => {
+        const socket = new SockJS('/patient/kafka/health_data');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function (frame) {
+            setConnected(true);
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/patients/health/data', function (greeting) {
+                showGreeting(JSON.parse(greeting.body).content);
+            });
+        });
+    }
+
     // const runKafka = async () => {
     //     const kafka = new Kafka({
     //         clientId: 'my-app',
