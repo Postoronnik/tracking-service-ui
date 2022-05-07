@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import * as Styled from './PatientCards.styled';
 import PatientCard from "./PatientCard/PatientCard";
-
+import { Stomp } from  '@stomp/stompjs';
 
 const PatientCards = () => {
     const [patients, setPatients] = useState([
@@ -43,49 +43,55 @@ const PatientCards = () => {
         }
     ]);
 
-    // const runKafka = async () => {
-    //     const kafka = new Kafka({
-    //         clientId: 'my-app',
-    //         brokers: ['localhost:9092'],
-    //     })
-    //
-    //     const consumer = kafka.consumer({ groupId: 'test-group' })
-    //
-    //     await consumer.connect()
-    //     await consumer.subscribe({ topic: 'test-topic', fromBeginning: true })
-    //
-    //     await consumer.run({
-    //         eachMessage: async ({ topic, partition, message }) => {
-    //             setPatients((prev) => {
-    //                 const foundEl = prev.find((el) => el.room === message?.room)
-    //                 const patientData = message.value;
-    //                 console.log(patientData);
-    //                 console.log(message);
-    //                 if (foundEl) {
-    //                     foundEl.pressureUpper = patientData?.pressureUpper;
-    //                     foundEl.pressureLow = patientData?.pressureLow;
-    //                     foundEl.heartRate = patientData?.heartRate;
-    //                     foundEl.bodyTemperature = patientData?.bodyTemperature;
-    //                     foundEl.saturation = patientData?.saturation;
-    //                     foundEl.status = patientData?.status;
-    //                 } else {
-    //                     prev.push(patientData);
-    //                 }
-    //
-    //                 return [...prev];
-    //             })
-    //         },
-    //     })
-    // }
+    useEffect(() => {
+        connect();
+    }, []);
 
-    // useEffect(() => {
-    //     runKafka().catch(console.log);
-    // }, []);
+    let stompClient = null;
+
+    const connect = () => {
+        stompClient = Stomp.client('ws://localhost:10005/medSystem');
+        stompClient.connect({}, (frame) => {
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/topic/healthData', function (message) {
+                console.log(message);
+                onMessageReceived(JSON.parse(message.body));
+            });
+        });
+    }
+
+    const onMessageReceived = (msg) => {
+        setPatients((prev) => {
+            const foundEl = prev.find((el) => el.room === msg?.room)
+            if (foundEl) {
+                foundEl.room = msg?.room;
+                foundEl.pressureUpper = msg?.pressureUpper;
+                foundEl.pressureLow = msg?.pressureLow;
+                foundEl.heartRate = msg?.heartRate;
+                foundEl.bodyTemperature = msg?.bodyTemperature;
+                foundEl.saturation = msg?.saturation;
+                foundEl.status = msg?.status;
+            } else {
+                prev.push(msg);
+            }
+
+            return [...prev];
+        })
+    }
 
     return (
         <Styled.CardWrapper>
             {patients.map(value => {
-                return (<PatientCard {...value}/>);
+                return (<PatientCard
+                    key={value.room}
+                    room={value.room}
+                    pressureUpper={value.pressureUpper}
+                    pressureLow={value.pressureLow}
+                    heartRate={value.heartRate}
+                    bodyTemperature={value.bodyTemperature}
+                    saturation={value.saturation}
+                    status={value.status}
+                    />);
             })}
         </Styled.CardWrapper>
     );

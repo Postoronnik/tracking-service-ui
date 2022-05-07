@@ -4,6 +4,8 @@ import requireTransform from 'vite-plugin-require-transform';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    plugins: [react(), requireTransform({})]
-
+    plugins: [react(), requireTransform({})],
+    server: {
+        port: 3000,
+    }
 })
