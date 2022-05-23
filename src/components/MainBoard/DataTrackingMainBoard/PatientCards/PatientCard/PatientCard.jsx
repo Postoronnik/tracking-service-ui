@@ -5,9 +5,9 @@ const PatientCard = (
     {room, pressureUpper, pressureLow, heartRate, bodyTemperature, saturation, status}
 ) => {
 
-    const color = (status === "Normal")
-        ? '#1E90FF' : (status === "Medium")
-        ? '#FF8C00' : (status === "Hard")
+    const color = (status === "NORMAL")
+        ? '#1E90FF' : (status === "MEDIUM")
+        ? '#FF8C00' : (status === "HARD")
         ? '#FF0000' : '#8B0000'
 
 

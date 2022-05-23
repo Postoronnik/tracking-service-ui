@@ -32,11 +32,8 @@ export const ContentBoard = styled(Layout.Content)`
   background: white;
   margin: 24px 16px;
   padding: 24px;
-  minHeight: 280;
-`;
-
-export const MenuBoard = styled.div`
-  background: #1E90FF;
+  width: 2000px;
+  height: 1050px;
 `;
 
 export const Trigger = styled(MenuOutlined)`

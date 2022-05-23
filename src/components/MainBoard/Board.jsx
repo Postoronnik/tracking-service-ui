@@ -2,20 +2,30 @@ import React, {useState} from 'react';
 import { Layout, Menu } from 'antd';
 import {
   UserOutlined,
-  UploadOutlined, CopyOutlined,
+  CopyOutlined,
 } from '@ant-design/icons';
 
 import * as Styled from './Board.styled';
-import PatientCards from "./PatientCards/PatientCards";
+import PatientCards from "./DataTrackingMainBoard/PatientCards/PatientCards";
+import DataControlMainBoard from "./DataControllMainBoard/DataControlMainBoard";
 
 const {Sider} = Layout;
 
 const Board = () => {
-  const [collapsed, setCollapsed] = useState();
+  const [collapsed, setCollapsed] = useState(false);
+  const [boardType, setBoardType] = useState("1");
 
   const toggle = () => {
     setCollapsed(prev=>!prev);
   };
+
+  const selectBoard = (e) => {
+    if (e.key === boardType) {
+      return;
+    }
+    setBoardType(e.key);
+    console.log(e.key);
+  }
 
   return (
       <Layout>
@@ -25,22 +35,24 @@ const Board = () => {
         </Styled.Header>
         <Styled.InnerLayout>
           <Sider trigger={null} collapsible collapsed={collapsed} collapsedWidth = '0' style={{background : 'white'}}>
-            <Menu theme="white" mode="inline">
-              <Menu.Item key="1" icon={<UserOutlined />}>
+            <Menu theme="white" mode="inline" selectedKeys={boardType}>
+              <Menu.Item key="1" icon={<UserOutlined />} onClick={selectBoard} >
                 Patients Tracker
               </Menu.Item>
-              <Menu.Item key="2" icon={<CopyOutlined />}>
+              <Menu.Item key="2" icon={<CopyOutlined />} onClick={selectBoard}>
                 Patient Data
-              </Menu.Item>
-              <Menu.Item key="3" icon={<UploadOutlined />}>
-                Data emulator
               </Menu.Item>
             </Menu>
           </Sider>
           <Styled.ContentBoard>
-            <PatientCards>
+            {boardType === "1" ?
+                <PatientCards>
+                </PatientCards>
+                :
+                <DataControlMainBoard>
 
-            </PatientCards>
+                </DataControlMainBoard>
+            }
           </Styled.ContentBoard>
         </Styled.InnerLayout>
       </Layout>
